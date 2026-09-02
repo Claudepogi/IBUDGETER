@@ -1,6 +1,9 @@
 (function() {
     "use strict";
 
+    // ============================================================
+    // DOM REFERENCES
+    // ============================================================
     const scannerElement = document.getElementById('scanner');
     const resultsDiv = document.getElementById('results');
     const loadingDiv = document.getElementById('loading');
@@ -21,6 +24,9 @@
     const listTotal = document.getElementById('listTotal');
     const clearListBtn = document.getElementById('clearListBtn');
 
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
     let html5QrCode = null;
     let isProcessing = false;
     let scannerActive = false;
@@ -30,7 +36,11 @@
     let currentProduct = null;
     let currentQuantity = 1;
 
+    // ============================================================
+    // SRP DATABASE
+    // ============================================================
     const srpDatabase = {
+        // Canned Goods
         'argentina corned beef': 39.00,
         'argentina corned beef 260g': 65.00,
         'purefoods corned beef': 69.00,
@@ -60,6 +70,7 @@
         'purefoods luncheon meat': 125.00,
         'spam classic': 245.00,
 
+        // Sauces & Condiments (Bottle)
         'datu puti soy sauce': 73.00,
         'silver swan soy sauce': 74.00,
         'marca piña soy sauce': 72.00,
@@ -80,6 +91,7 @@
         'fish sauce': 28.00,
         'sesame oil': 145.00,
 
+        // Sauces & Condiments (Sachet)
         'soy sauce sachet': 10.00,
         'soy sauce twin pack': 18.00,
         'vinegar sachet': 10.00,
@@ -101,6 +113,7 @@
         'magic sarap sachet': 10.00,
         'magic sarap twin pack': 18.00,
 
+        // Butter & Margarine
         'butter': 105.00,
         'magnolia butter': 110.00,
         'butter sachet': 10.00,
@@ -109,36 +122,28 @@
         'margarine sachet': 10.00,
         'margarine twin pack': 18.00,
 
+        // Dairy & Milk
         'fresh milk': 98.00,
         'magnolia fresh milk': 110.00,
-
         'powdered milk': 20.00,
         'powdered milk sachet': 10.00,
         'powdered milk twin pack': 18.00,
-
         'bear brand powdered milk': 175.00,
         'bear brand sachet': 15.00,
         'bear brand twin pack': 25.00,
-
         'birch tree milk': 165.00,
         'birch tree sachet': 10.00,
         'birch tree twin pack': 20.00,
-
         'alaska evaporated milk': 42.00,
         'alaska evaporated sachet': 10.00,
         'alaska evaporated twin pack': 18.00,
-
         'alaska condensed milk': 39.00,
         'alaska condensed sachet': 10.00,
         'alaska condensed twin pack': 18.00,
-
         'alaska classic': 45.00,
-
         'doreen condensed milk': 55.00,
         'doreen 390g': 55.00,
-
         'angel evaporada': 35.00,
-
         'all-purpose cream': 48.00,
         'nestlé cream': 52.00,
         'eden cheese': 98.00,
@@ -147,30 +152,30 @@
         'eden cheese 160g': 55.00,
         'quickmelt cheese': 92.00,
         'cheese': 95.00,
-
         'yakult': 62.00,
         'magnolia yogurt drink': 36.00,
         'chuckie chocolate drink': 22.00,
         'milo ready-to-drink': 24.00,
         'ovaltine chocolate drink': 25.00,
 
+        // Coffee
         'nescafé classic': 108.00,
         'nescafe 3-in-1 sachet': 10.00,
         'nescafe 3-in-1 twin pack': 18.00,
-
         'great taste coffee': 86.00,
         'great taste 20g': 30.00,
         'great taste 3-in-1 sachet': 10.00,
         'great taste 3-in-1 twin pack': 18.00,
-
         'kopiko brown coffee': 90.00,
         'kopiko brown sachet': 10.00,
         'kopiko brown twin pack': 18.00,
 
+        // Bread
         'gardenia classic bread': 78.00,
         'pinoy tasty bread': 70.00,
         'bread loaf': 75.00,
 
+        // Noodles
         'lucky me pancit canton original': 18.00,
         'lucky me pancit canton chilimansi': 18.00,
         'lucky me pancit canton kalamansi': 18.00,
@@ -180,10 +185,44 @@
         'nissin ramen beef': 17.00,
         'payless xtra big pancit canton': 26.00,
 
+        // Snacks - All sizes
+        'skyflakes single': 8.00,
         'skyflakes crackers': 82.00,
+        'skyflakes 10 packs': 82.00,
+        'fita single': 8.50,
         'fita crackers': 85.00,
+        'fita 10 packs': 85.00,
+        'hansel single': 7.00,
         'hansel biscuits': 72.00,
+        'hansel 10 packs': 72.00,
+        'oreo single': 10.00,
         'oreo cookies': 48.00,
+        'rebisco single': 8.00,
+        'rebisco pack': 82.00,
+        'bingo single': 10.00,
+        'bingo pack': 15.00,
+        'bingo large': 25.00,
+        'presto single': 10.00,
+        'presto pack': 15.00,
+        'presto large': 25.00,
+        'hansel mocha single': 7.00,
+        'hansel mocha pack': 72.00,
+        'sunflower crackers single': 8.00,
+        'sunflower crackers pack': 80.00,
+        'cracker nuts single': 10.00,
+        'cracker nuts pack': 38.00,
+        'combi regular': 10.00,
+        'combi large': 18.00,
+        'chippy regular': 10.00,
+        'chippy large': 18.00,
+        'clover chips regular': 10.00,
+        'clover chips large': 18.00,
+        'jack n jill regular': 10.00,
+        'jack n jill large': 18.00,
+        'martys cracklin regular': 15.00,
+        'martys cracklin large': 25.00,
+        'tortillos regular': 12.00,
+        'tortillos large': 22.00,
         'oishi prawn crackers': 32.00,
         'oishi rinbee': 30.00,
         'cheese ring': 28.00,
@@ -198,11 +237,6 @@
         'nagaraya cracker nuts': 38.00,
         'boy bawang cornick': 35.00,
         'crispy fry': 20.00,
-
-        'skyflakes single': 8.00,
-        'fita single': 8.50,
-        'hansel single': 7.00,
-        'oreo single': 5.00,
         'choco mucho': 16.00,
         'choco mucho single': 6.00,
         'cloud 9': 13.00,
@@ -214,34 +248,99 @@
         'mentos mint': 22.00,
         'maxx candy': 18.00,
 
-        'coca-cola': 72.00,
-        'pepsi': 70.00,
-        'royal tru orange': 72.00,
-        'sprite': 72.00,
-
+        // Drinks
+        'coca-cola 1.5l': 75.00,
+        'coca-cola 1l': 60.00,
+        'coca-cola can': 30.00,
+        'coca-cola small': 25.00,
+        'pepsi 1.5l': 75.00,
+        'pepsi 1l': 60.00,
+        'pepsi can': 30.00,
+        'pepsi small': 25.00,
+        'royal tru orange 1.5l': 75.00,
+        'royal tru orange 1l': 60.00,
+        'royal tru orange can': 30.00,
+        'royal tru orange small': 25.00,
+        'sprite 1.5l': 75.00,
+        'sprite 1l': 60.00,
+        'sprite can': 30.00,
+        'sprite small': 25.00,
         'wilkins drinking water': 30.00,
         'nature\'s spring water': 25.00,
-
         'c2 green tea': 32.00,
         'zesto juice drink': 14.00,
         'del monte pineapple juice': 92.00,
-
-        'chuckie chocolate drink': 22.00,
-        'milo ready-to-drink': 24.00,
-        'ovaltine chocolate drink': 25.00,
-
-        'yakult': 62.00,
-        'magnolia yogurt drink': 36.00,
-
         'tang orange powder': 14.00,
         'nestea iced tea powder': 14.00,
-
         'tang powder sachet': 20.00,
         'tang powder twin pack': 35.00,
         'nestea powder sachet': 20.00,
         'nestea powder twin pack': 35.00
     };
 
+    // ============================================================
+    // SIZE VARIATIONS DATABASE
+    // ============================================================
+    var sizeVariations = {
+        'rebisco': [
+            { label: 'Single Pack', key: 'rebisco single', price: 8.00 },
+            { label: '10-Pack', key: 'rebisco pack', price: 82.00 }
+        ],
+        'skyflakes': [
+            { label: 'Single Pack', key: 'skyflakes single', price: 8.00 },
+            { label: '10-Pack', key: 'skyflakes 10 packs', price: 82.00 }
+        ],
+        'fita': [
+            { label: 'Single Pack', key: 'fita single', price: 8.50 },
+            { label: '10-Pack', key: 'fita 10 packs', price: 85.00 }
+        ],
+        'hansel': [
+            { label: 'Single Pack', key: 'hansel single', price: 7.00 },
+            { label: '10-Pack', key: 'hansel 10 packs', price: 72.00 }
+        ],
+        'oreo': [
+            { label: 'Single Pack', key: 'oreo single', price: 10.00 },
+            { label: 'Regular Pack', key: 'oreo cookies', price: 48.00 }
+        ],
+        'bingo': [
+            { label: 'Single Pack', key: 'bingo single', price: 10.00 },
+            { label: 'Regular Pack', key: 'bingo pack', price: 15.00 },
+            { label: 'Large Pack', key: 'bingo large', price: 25.00 }
+        ],
+        'presto': [
+            { label: 'Single Pack', key: 'presto single', price: 10.00 },
+            { label: 'Regular Pack', key: 'presto pack', price: 15.00 },
+            { label: 'Large Pack', key: 'presto large', price: 25.00 }
+        ],
+        'coca-cola': [
+            { label: '250ml Small', key: 'coca-cola small', price: 25.00 },
+            { label: '1L Bottle', key: 'coca-cola 1l', price: 60.00 },
+            { label: '1.5L Bottle', key: 'coca-cola 1.5l', price: 75.00 },
+            { label: 'Can (330ml)', key: 'coca-cola can', price: 30.00 }
+        ],
+        'pepsi': [
+            { label: '250ml Small', key: 'pepsi small', price: 25.00 },
+            { label: '1L Bottle', key: 'pepsi 1l', price: 60.00 },
+            { label: '1.5L Bottle', key: 'pepsi 1.5l', price: 75.00 },
+            { label: 'Can (330ml)', key: 'pepsi can', price: 30.00 }
+        ],
+        'royal': [
+            { label: '250ml Small', key: 'royal tru orange small', price: 25.00 },
+            { label: '1L Bottle', key: 'royal tru orange 1l', price: 60.00 },
+            { label: '1.5L Bottle', key: 'royal tru orange 1.5l', price: 75.00 },
+            { label: 'Can (330ml)', key: 'royal tru orange can', price: 30.00 }
+        ],
+        'sprite': [
+            { label: '250ml Small', key: 'sprite small', price: 25.00 },
+            { label: '1L Bottle', key: 'sprite 1l', price: 60.00 },
+            { label: '1.5L Bottle', key: 'sprite 1.5l', price: 75.00 },
+            { label: 'Can (330ml)', key: 'sprite can', price: 30.00 }
+        ]
+    };
+
+    // ============================================================
+    // BUDGET FUNCTIONS
+    // ============================================================
     function setBudget() {
         var value = parseFloat(budgetInput.value);
         if (isNaN(value) || value <= 0) {
@@ -295,6 +394,9 @@
         return total;
     }
 
+    // ============================================================
+    // SHOPPING LIST FUNCTIONS
+    // ============================================================
     function addToList(product, quantity) {
         if (!budget || budget <= 0) {
             alert('Please set a budget first!');
@@ -399,6 +501,9 @@
         listTotal.textContent = '₱' + calculateTotalSpent().toFixed(2);
     }
 
+    // ============================================================
+    // SAVE/LOAD - LocalStorage
+    // ============================================================
     function saveState() {
         try {
             var state = {
@@ -432,6 +537,9 @@
         }
     }
 
+    // ============================================================
+    // SCANNER FUNCTIONS
+    // ============================================================
     function startScanner() {
         if (html5QrCode) {
             html5QrCode.stop().then(function() {
@@ -500,40 +608,18 @@
 
     function onScanFailure(err) {}
 
-    function formatNutritionValue(value) {
-        if (value === '—' || value === undefined || value === null || value === '') {
-            return '—';
-        }
-        
-        var numValue;
-        if (typeof value === 'number') {
-            numValue = value;
-        } else if (typeof value === 'string') {
-            var cleaned = value.replace(/[^0-9.]/g, '');
-            if (cleaned === '') return '—';
-            numValue = parseFloat(cleaned);
-            if (isNaN(numValue)) return '—';
-        } else {
-            return '—';
-        }
-        
-        var rounded = Math.round(numValue * 10) / 10;
-        if (rounded % 1 === 0) {
-            return rounded.toString();
-        } else {
-            return rounded.toFixed(1);
-        }
-    }
-
+    // ============================================================
+    // PRICE LOOKUP - Database first, then API
+    // ============================================================
     function findSRPPrice(product) {
         var productName = (product.product_name || '').toLowerCase().trim();
         var brand = (product.brands || '').toLowerCase();
         var quantity = (product.quantity || '').toLowerCase().trim();
         var categories = (product.categories || '').toLowerCase();
         
-        var isSachet = productName.indexOf('sachet') !== -1 || quantity.indexOf('sachet') !== -1 || productName.indexOf('sache') !== -1 || quantity.indexOf('sache') !== -1;
-        var isTwinPack = productName.indexOf('twin') !== -1 || productName.indexOf('2 pack') !== -1 || quantity.indexOf('twin') !== -1 || productName.indexOf('2-pak') !== -1 || productName.indexOf('2pcs') !== -1 || quantity.indexOf('2 pack') !== -1;
-        var isSingle = productName.indexOf('single') !== -1 || quantity.indexOf('single') !== -1 || productName.indexOf('1 pack') !== -1 || quantity.indexOf('1 pack') !== -1;
+        var isSachet = productName.indexOf('sachet') !== -1 || quantity.indexOf('sachet') !== -1;
+        var isTwinPack = productName.indexOf('twin') !== -1 || productName.indexOf('2 pack') !== -1;
+        var isSingle = productName.indexOf('single') !== -1 || productName.indexOf('1 pack') !== -1;
         
         var key;
         
@@ -632,10 +718,10 @@
             'oishi': 32.00,
             'piattos': 20.00,
             'nova': 41.00,
-            'coca-cola': 72.00,
-            'pepsi': 70.00,
-            'sprite': 72.00,
-            'royal': 72.00,
+            'coca-cola': 75.00,
+            'pepsi': 75.00,
+            'sprite': 75.00,
+            'royal': 75.00,
             'c2': 32.00,
             'chuckie': 22.00,
             'milo': 24.00,
@@ -647,7 +733,18 @@
             'reno': 32.00,
             'saba': 30.00,
             'bluebay': 35.00,
-            'angel': 35.00
+            'angel': 35.00,
+            'combi': 10.00,
+            'chippy': 10.00,
+            'clover': 10.00,
+            'jack n jill': 10.00,
+            'martys': 15.00,
+            'tortillos': 12.00,
+            'bingo': 10.00,
+            'presto': 10.00,
+            'rebisco': 8.00,
+            'sunflower': 8.00,
+            'cracker nuts': 10.00
         };
         
         for (var brandName in brandCategoryMap) {
@@ -689,6 +786,9 @@
         return null;
     }
 
+    // ============================================================
+    // PRODUCT LOOKUP - Fetch from API with Size Selector
+    // ============================================================
     async function lookupProduct(barcode) {
         var cleanBarcode = barcode.replace(/\D/g, '');
         if (!cleanBarcode) {
@@ -704,7 +804,7 @@
         try {
             var url = 'https://world.openfoodfacts.org/api/v0/product/' + cleanBarcode + '.json';
             var response = await fetch(url, {
-                headers: { 'User-Agent': 'FoodScannerApp-Demo' }
+                headers: { 'User-Agent': 'IBUDGETER-App' }
             });
 
             if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -722,7 +822,6 @@
             var ingredients = p.ingredients_text || p.ingredients_text_en || 'No ingredients information.';
 
             var n = p.nutriments || {};
-            
             var energy = n.energy_kcal ?? n.energy ?? '—';
             var fat = n.fat ?? '—';
             var carbs = n.carbohydrates ?? '—';
@@ -732,18 +831,15 @@
             
             var salt = n.salt ?? '—';
             var sodium = n.sodium ?? '—';
-            
             if (salt === '' || salt === null || salt === undefined) salt = '—';
             if (sodium === '' || sodium === null || sodium === undefined) sodium = '—';
             
             var saltNum = null;
             var sodiumNum = null;
-            
             if (salt !== '—') {
                 var parsedSalt = parseFloat(salt);
                 if (!isNaN(parsedSalt)) saltNum = parsedSalt;
             }
-            
             if (sodium !== '—') {
                 var parsedSodium = parseFloat(sodium);
                 if (!isNaN(parsedSodium)) sodiumNum = parsedSodium;
@@ -751,18 +847,111 @@
             
             var showSaltOnly = false;
             var showSodiumOnly = false;
-            
             if (saltNum !== null) {
                 showSaltOnly = true;
             } else if (sodiumNum !== null) {
                 showSodiumOnly = true;
             }
             
-            // Try to get price from database first
+            var productNameLower = name.toLowerCase();
             var srpPrice = findSRPPrice(p);
             var priceSource = 'SRP Database';
             
-            // If not found in database, try API
+            // ============================================================
+            // CHECK FOR SIZE VARIATIONS
+            // ============================================================
+            var matchedBrand = null;
+            for (var brandKey in sizeVariations) {
+                if (productNameLower.indexOf(brandKey) !== -1) {
+                    matchedBrand = brandKey;
+                    break;
+                }
+            }
+            
+            // If we have size options, show the selector
+            if (matchedBrand && sizeVariations[matchedBrand].length > 1) {
+                var options = sizeVariations[matchedBrand];
+                var defaultOption = options[0];
+                
+                // Try to find which option matches the current price
+                for (var o = 0; o < options.length; o++) {
+                    var opt = options[o];
+                    if (srpPrice === opt.price) {
+                        defaultOption = opt;
+                        break;
+                    }
+                }
+                
+                currentProduct = {
+                    barcode: cleanBarcode,
+                    name: name,
+                    brand: brand,
+                    price: defaultOption.price
+                };
+                
+                var sizeSelectorHtml = '<div class="size-selector" style="margin-top:8px;padding:10px;background:#f0f7f4;border-radius:12px;border:1px solid #d4e4de;">';
+                sizeSelectorHtml += '<label style="font-weight:600;font-size:13px;color:#1f3530;display:block;margin-bottom:6px;">Select Size:</label>';
+                sizeSelectorHtml += '<select id="sizeSelect" style="width:100%;padding:10px;border:2px solid #d4e4de;border-radius:10px;font-size:14px;background:white;outline:none;">';
+                
+                for (var s = 0; s < options.length; s++) {
+                    var option = options[s];
+                    var selected = (defaultOption && option.key === defaultOption.key) ? 'selected' : '';
+                    sizeSelectorHtml += '<option value="' + option.key + '" data-price="' + option.price + '" ' + selected + '>' + option.label + ' - ₱' + option.price.toFixed(2) + '</option>';
+                }
+                
+                sizeSelectorHtml += '</select>';
+                sizeSelectorHtml += '</div>';
+                
+                var priceHtml = '<div class="price-section"><div><div class="price-label">SRP (2026)</div><div class="price-value" id="selectedPrice">₱' + defaultOption.price.toFixed(2) + '</div><div class="price-details"><span class="price-tag">' + priceSource + '</span></div></div><div class="quantity-selector"><button class="qty-btn" id="qtyMinus">−</button><span class="qty-number" id="qtyDisplay">1</span><button class="qty-btn" id="qtyPlus">+</button><button class="add-to-list-btn" id="addWithQuantity">Add to List</button></div></div>' + sizeSelectorHtml;
+                
+                var saltSodiumHtml = '';
+                if (showSaltOnly && saltNum !== null) {
+                    saltSodiumHtml = '<div class="salt-sodium-section"><div class="salt-sodium-item"><div class="value">' + formatNutritionValue(saltNum) + 'g</div><div class="label">Salt</div></div></div>';
+                } else if (showSodiumOnly && sodiumNum !== null) {
+                    saltSodiumHtml = '<div class="salt-sodium-section"><div class="salt-sodium-item"><div class="value">' + formatNutritionValue(sodiumNum) + 'mg</div><div class="label">Sodium</div></div></div>';
+                }
+                
+                var nutritionHtml = '<div class="nutrition-grid"><div class="nutrition-item"><div class="value">' + formatNutritionValue(energy) + '</div><div class="label">Energy (kcal)</div></div><div class="nutrition-item"><div class="value">' + formatNutritionValue(fat) + 'g</div><div class="label">Fat</div></div><div class="nutrition-item"><div class="value">' + formatNutritionValue(carbs) + 'g</div><div class="label">Carbs</div></div><div class="nutrition-item"><div class="value">' + formatNutritionValue(protein) + 'g</div><div class="label">Protein</div></div><div class="nutrition-item"><div class="value">' + formatNutritionValue(sugars) + 'g</div><div class="label">Sugars</div></div><div class="nutrition-item"><div class="value">' + formatNutritionValue(fiber) + 'g</div><div class="label">Fiber</div></div></div>';
+
+                resultsDiv.innerHTML = '<div class="product-name">' + escapeHtml(name) + '</div><div class="product-brand">' + escapeHtml(brand) + '</div>' + priceHtml + nutritionHtml + saltSodiumHtml + '<div class="ingredients-section"><h3>Ingredients</h3><p>' + escapeHtml(ingredients) + '</p></div>';
+                resultsDiv.style.display = 'block';
+
+                // Size selector change event
+                document.getElementById('sizeSelect').addEventListener('change', function() {
+                    var selectedOption = this.options[this.selectedIndex];
+                    var newPrice = parseFloat(selectedOption.getAttribute('data-price'));
+                    document.getElementById('selectedPrice').textContent = '₱' + newPrice.toFixed(2);
+                    currentProduct.price = newPrice;
+                });
+
+                // Quantity selector events
+                document.getElementById('qtyMinus').addEventListener('click', function() {
+                    if (currentQuantity > 1) {
+                        currentQuantity--;
+                        document.getElementById('qtyDisplay').textContent = currentQuantity;
+                        document.querySelector('.add-to-list-btn').textContent = 'Add ' + currentQuantity + ' to List';
+                    }
+                });
+
+                document.getElementById('qtyPlus').addEventListener('click', function() {
+                    currentQuantity++;
+                    document.getElementById('qtyDisplay').textContent = currentQuantity;
+                    document.querySelector('.add-to-list-btn').textContent = 'Add ' + currentQuantity + ' to List';
+                });
+
+                document.getElementById('addWithQuantity').addEventListener('click', function() {
+                    if (currentProduct) {
+                        addToList(currentProduct, currentQuantity);
+                    }
+                });
+
+                loadingDiv.style.display = 'none';
+                return;
+            }
+            
+            // ============================================================
+            // NORMAL FLOW - No size variations
+            // ============================================================
             if (srpPrice === null) {
                 var apiPrice = p.product_price || p.price || null;
                 if (apiPrice !== null && !isNaN(parseFloat(apiPrice)) && parseFloat(apiPrice) > 0) {
@@ -823,13 +1012,40 @@
         }
     }
 
-    window.addToListFromCurrent = function() {
-        if (currentProduct) {
-            addToList(currentProduct, currentQuantity);
-        } else {
-            alert('No product to add.');
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+    function formatNutritionValue(value) {
+        if (value === '—' || value === undefined || value === null || value === '') {
+            return '—';
         }
-    };
+        
+        var numValue;
+        if (typeof value === 'number') {
+            numValue = value;
+        } else if (typeof value === 'string') {
+            var cleaned = value.replace(/[^0-9.]/g, '');
+            if (cleaned === '') return '—';
+            numValue = parseFloat(cleaned);
+            if (isNaN(numValue)) return '—';
+        } else {
+            return '—';
+        }
+        
+        var rounded = Math.round(numValue * 10) / 10;
+        if (rounded % 1 === 0) {
+            return rounded.toString();
+        } else {
+            return rounded.toFixed(1);
+        }
+    }
+
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '—';
+        var div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
 
     function showNotFound(barcode) {
         resultsDiv.innerHTML = '<div class="not-found"><div class="emoji">🔍</div><h3>Product not found</h3><p>Barcode <strong>' + escapeHtml(barcode) + '</strong> is not in Open Food Facts.</p><p style="margin-top:6px;font-size:13px;">You can add it to help the community!</p></div>';
@@ -841,13 +1057,17 @@
         resultsDiv.style.display = 'block';
     }
 
-    function escapeHtml(text) {
-        if (text === null || text === undefined) return '—';
-        var div = document.createElement('div');
-        div.textContent = String(text);
-        return div.innerHTML;
-    }
+    window.addToListFromCurrent = function() {
+        if (currentProduct) {
+            addToList(currentProduct, currentQuantity);
+        } else {
+            alert('No product to add.');
+        }
+    };
 
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
     setBudgetBtn.addEventListener('click', setBudget);
     budgetInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
@@ -876,6 +1096,9 @@
         }
     });
 
+    // ============================================================
+    // VISIBILITY
+    // ============================================================
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
             stopScanner();
@@ -886,6 +1109,9 @@
         }
     });
 
+    // ============================================================
+    // INIT
+    // ============================================================
     window.addEventListener('load', function() {
         loadState();
         setTimeout(startScanner, 400);
