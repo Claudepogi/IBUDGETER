@@ -1,9 +1,7 @@
 (function() {
     "use strict";
 
-    // ============================================================
     // DOM REFERENCES
-    // ============================================================
     const scannerElement = document.getElementById('scanner');
     const resultsDiv = document.getElementById('results');
     const loadingDiv = document.getElementById('loading');
@@ -24,9 +22,6 @@
     const listTotal = document.getElementById('listTotal');
     const clearListBtn = document.getElementById('clearListBtn');
 
-    // ============================================================
-    // STATE VARIABLES
-    // ============================================================
     let html5QrCode = null;
     let isProcessing = false;
     let scannerActive = false;
@@ -36,11 +31,8 @@
     let currentProduct = null;
     let currentQuantity = 1;
 
-    // ============================================================
-    // SRP DATABASE
-    // ============================================================
+    // ===== SRP DATABASE =====
     const srpDatabase = {
-        // Canned Goods
         'argentina corned beef': 39.00,
         'argentina corned beef 260g': 65.00,
         'purefoods corned beef': 69.00,
@@ -70,7 +62,6 @@
         'purefoods luncheon meat': 125.00,
         'spam classic': 245.00,
 
-        // Sauces & Condiments (Bottle)
         'datu puti soy sauce': 73.00,
         'silver swan soy sauce': 74.00,
         'marca piña soy sauce': 72.00,
@@ -91,7 +82,6 @@
         'fish sauce': 28.00,
         'sesame oil': 145.00,
 
-        // Sauces & Condiments (Sachet)
         'soy sauce sachet': 10.00,
         'soy sauce twin pack': 18.00,
         'vinegar sachet': 10.00,
@@ -113,7 +103,6 @@
         'magic sarap sachet': 10.00,
         'magic sarap twin pack': 18.00,
 
-        // Butter & Margarine
         'butter': 105.00,
         'magnolia butter': 110.00,
         'butter sachet': 10.00,
@@ -122,7 +111,6 @@
         'margarine sachet': 10.00,
         'margarine twin pack': 18.00,
 
-        // Dairy & Milk
         'fresh milk': 98.00,
         'magnolia fresh milk': 110.00,
         'powdered milk': 20.00,
@@ -158,7 +146,6 @@
         'milo ready-to-drink': 24.00,
         'ovaltine chocolate drink': 25.00,
 
-        // Coffee
         'nescafé classic': 108.00,
         'nescafe 3-in-1 sachet': 10.00,
         'nescafe 3-in-1 twin pack': 18.00,
@@ -170,12 +157,10 @@
         'kopiko brown sachet': 10.00,
         'kopiko brown twin pack': 18.00,
 
-        // Bread
         'gardenia classic bread': 78.00,
         'pinoy tasty bread': 70.00,
         'bread loaf': 75.00,
 
-        // Noodles
         'lucky me pancit canton original': 18.00,
         'lucky me pancit canton chilimansi': 18.00,
         'lucky me pancit canton kalamansi': 18.00,
@@ -185,7 +170,7 @@
         'nissin ramen beef': 17.00,
         'payless xtra big pancit canton': 26.00,
 
-        // Snacks - All sizes
+        // ===== SNACKS =====
         'skyflakes single': 8.00,
         'skyflakes crackers': 82.00,
         'skyflakes 10 packs': 82.00,
@@ -248,7 +233,7 @@
         'mentos mint': 22.00,
         'maxx candy': 18.00,
 
-        // Drinks
+        // ===== DRINKS =====
         'coca-cola 1.5l': 75.00,
         'coca-cola 1l': 60.00,
         'coca-cola can': 30.00,
@@ -278,9 +263,7 @@
         'nestea powder twin pack': 35.00
     };
 
-    // ============================================================
-    // SIZE VARIATIONS DATABASE
-    // ============================================================
+    // ===== SIZE VARIATIONS =====
     var sizeVariations = {
         'rebisco': [
             { label: 'Single Pack', key: 'rebisco single', price: 8.00 },
@@ -338,9 +321,7 @@
         ]
     };
 
-    // ============================================================
-    // BUDGET FUNCTIONS
-    // ============================================================
+    // ===== BUDGET FUNCTIONS =====
     function setBudget() {
         var value = parseFloat(budgetInput.value);
         if (isNaN(value) || value <= 0) {
@@ -394,9 +375,7 @@
         return total;
     }
 
-    // ============================================================
-    // SHOPPING LIST FUNCTIONS
-    // ============================================================
+    // ===== SHOPPING LIST FUNCTIONS =====
     function addToList(product, quantity) {
         if (!budget || budget <= 0) {
             alert('Please set a budget first!');
@@ -501,9 +480,7 @@
         listTotal.textContent = '₱' + calculateTotalSpent().toFixed(2);
     }
 
-    // ============================================================
-    // SAVE/LOAD - LocalStorage
-    // ============================================================
+    // ===== SAVE/LOAD =====
     function saveState() {
         try {
             var state = {
@@ -537,9 +514,7 @@
         }
     }
 
-    // ============================================================
-    // SCANNER FUNCTIONS
-    // ============================================================
+    // ===== SCANNER FUNCTIONS =====
     function startScanner() {
         if (html5QrCode) {
             html5QrCode.stop().then(function() {
@@ -608,9 +583,7 @@
 
     function onScanFailure(err) {}
 
-    // ============================================================
-    // PRICE LOOKUP - Database first, then API
-    // ============================================================
+    // ===== PRICE LOOKUP =====
     function findSRPPrice(product) {
         var productName = (product.product_name || '').toLowerCase().trim();
         var brand = (product.brands || '').toLowerCase();
@@ -786,9 +759,7 @@
         return null;
     }
 
-    // ============================================================
-    // PRODUCT LOOKUP - Fetch from API with Size Selector
-    // ============================================================
+    // ===== PRODUCT LOOKUP =====
     async function lookupProduct(barcode) {
         var cleanBarcode = barcode.replace(/\D/g, '');
         if (!cleanBarcode) {
@@ -857,9 +828,7 @@
             var srpPrice = findSRPPrice(p);
             var priceSource = 'SRP Database';
             
-            // ============================================================
-            // CHECK FOR SIZE VARIATIONS
-            // ============================================================
+            // ===== PERMANENT SIZE SELECTOR =====
             var matchedBrand = null;
             for (var brandKey in sizeVariations) {
                 if (productNameLower.indexOf(brandKey) !== -1) {
@@ -868,17 +837,30 @@
                 }
             }
             
-            // If we have size options, show the selector
             if (matchedBrand && sizeVariations[matchedBrand].length > 1) {
                 var options = sizeVariations[matchedBrand];
                 var defaultOption = options[0];
                 
-                // Try to find which option matches the current price
                 for (var o = 0; o < options.length; o++) {
                     var opt = options[o];
                     if (srpPrice === opt.price) {
                         defaultOption = opt;
                         break;
+                    }
+                    if (productNameLower.indexOf('single') !== -1 && opt.label.indexOf('Single') !== -1) {
+                        defaultOption = opt;
+                    } else if (productNameLower.indexOf('10 pack') !== -1 && opt.label.indexOf('10-Pack') !== -1) {
+                        defaultOption = opt;
+                    } else if (productNameLower.indexOf('large') !== -1 && opt.label.indexOf('Large') !== -1) {
+                        defaultOption = opt;
+                    } else if (productNameLower.indexOf('can') !== -1 && opt.label.indexOf('Can') !== -1) {
+                        defaultOption = opt;
+                    } else if (productNameLower.indexOf('1.5l') !== -1 && opt.label.indexOf('1.5L') !== -1) {
+                        defaultOption = opt;
+                    } else if (productNameLower.indexOf('1l') !== -1 && opt.label.indexOf('1L') !== -1) {
+                        defaultOption = opt;
+                    } else if (productNameLower.indexOf('250ml') !== -1 && opt.label.indexOf('250ml') !== -1) {
+                        defaultOption = opt;
                     }
                 }
                 
@@ -890,8 +872,8 @@
                 };
                 
                 var sizeSelectorHtml = '<div class="size-selector" style="margin-top:8px;padding:10px;background:#f0f7f4;border-radius:12px;border:1px solid #d4e4de;">';
-                sizeSelectorHtml += '<label style="font-weight:600;font-size:13px;color:#1f3530;display:block;margin-bottom:6px;">Select Size:</label>';
-                sizeSelectorHtml += '<select id="sizeSelect" style="width:100%;padding:10px;border:2px solid #d4e4de;border-radius:10px;font-size:14px;background:white;outline:none;">';
+                sizeSelectorHtml += '<label style="font-weight:600;font-size:13px;color:#1f3530;display:block;margin-bottom:6px;">📦 Select Size:</label>';
+                sizeSelectorHtml += '<select id="sizeSelect" style="width:100%;padding:10px;border:2px solid #d4e4de;border-radius:10px;font-size:14px;background:white;outline:none;cursor:pointer;">';
                 
                 for (var s = 0; s < options.length; s++) {
                     var option = options[s];
@@ -916,7 +898,6 @@
                 resultsDiv.innerHTML = '<div class="product-name">' + escapeHtml(name) + '</div><div class="product-brand">' + escapeHtml(brand) + '</div>' + priceHtml + nutritionHtml + saltSodiumHtml + '<div class="ingredients-section"><h3>Ingredients</h3><p>' + escapeHtml(ingredients) + '</p></div>';
                 resultsDiv.style.display = 'block';
 
-                // Size selector change event
                 document.getElementById('sizeSelect').addEventListener('change', function() {
                     var selectedOption = this.options[this.selectedIndex];
                     var newPrice = parseFloat(selectedOption.getAttribute('data-price'));
@@ -924,7 +905,6 @@
                     currentProduct.price = newPrice;
                 });
 
-                // Quantity selector events
                 document.getElementById('qtyMinus').addEventListener('click', function() {
                     if (currentQuantity > 1) {
                         currentQuantity--;
@@ -949,9 +929,7 @@
                 return;
             }
             
-            // ============================================================
-            // NORMAL FLOW - No size variations
-            // ============================================================
+            // ===== NORMAL FLOW =====
             if (srpPrice === null) {
                 var apiPrice = p.product_price || p.price || null;
                 if (apiPrice !== null && !isNaN(parseFloat(apiPrice)) && parseFloat(apiPrice) > 0) {
@@ -1012,9 +990,7 @@
         }
     }
 
-    // ============================================================
-    // HELPER FUNCTIONS
-    // ============================================================
+    // ===== HELPER FUNCTIONS =====
     function formatNutritionValue(value) {
         if (value === '—' || value === undefined || value === null || value === '') {
             return '—';
@@ -1065,9 +1041,7 @@
         }
     };
 
-    // ============================================================
-    // EVENT LISTENERS
-    // ============================================================
+    // ===== EVENT LISTENERS =====
     setBudgetBtn.addEventListener('click', setBudget);
     budgetInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
@@ -1096,9 +1070,7 @@
         }
     });
 
-    // ============================================================
-    // VISIBILITY
-    // ============================================================
+    // ===== VISIBILITY =====
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
             stopScanner();
@@ -1109,9 +1081,7 @@
         }
     });
 
-    // ============================================================
-    // INIT
-    // ============================================================
+    // ===== INIT =====
     window.addEventListener('load', function() {
         loadState();
         setTimeout(startScanner, 400);
